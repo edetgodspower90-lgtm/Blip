@@ -48,7 +48,26 @@ export default function HomePage() {
     return () => container.removeEventListener("scroll", handleScroll);
   }, [activeIndex]);
 
-  const displayedPosts = feedTab === "forYou" ? MOCK_POSTS : MOCK_POSTS.slice(0, 2);
+  const [livePosts, setLivePosts] = useState<PostItem[]>(MOCK_POSTS);
+
+  useEffect(() => {
+    async function loadFeed() {
+      try {
+        const res = await fetch("/api/posts?limit=20");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.posts && data.posts.length > 0) {
+            setLivePosts(data.posts);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch live feed, using fallback:", err);
+      }
+    }
+    loadFeed();
+  }, []);
+
+  const displayedPosts = feedTab === "forYou" ? livePosts : livePosts.slice(0, 2);
 
   return (
     <div className="relative w-full h-[calc(100vh-3.5rem)] md:h-screen bg-black overflow-hidden flex flex-col items-center">

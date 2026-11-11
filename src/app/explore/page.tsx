@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Search, Flame, Play, Heart, MessageCircle } from "lucide-react";
@@ -21,15 +21,33 @@ const CATEGORIES = [
 export default function ExplorePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("🔥 Trending");
+  const [allPosts, setAllPosts] = useState(MOCK_POSTS);
+
+  useEffect(() => {
+    async function loadExplore() {
+      try {
+        const res = await fetch("/api/posts?limit=50");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.posts && data.posts.length > 0) {
+            setAllPosts(data.posts);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load explore feed:", err);
+      }
+    }
+    loadExplore();
+  }, []);
 
   const filteredPosts = searchQuery
-    ? MOCK_POSTS.filter(
+    ? allPosts.filter(
         (p) =>
-          p.caption.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()))
+          (p.caption || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (p.user?.username || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (p.tags || []).some((t: string) => t.toLowerCase().includes(searchQuery.toLowerCase()))
       )
-    : MOCK_POSTS;
+    : allPosts;
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-6 pb-20">

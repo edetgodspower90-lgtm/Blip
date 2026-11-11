@@ -11,6 +11,7 @@ import {
   User,
   Film,
   Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +33,7 @@ export function Sidebar() {
     { label: "Notifications", href: "/notifications", icon: Bell, badge: 3 },
     { label: "Create", href: "/create", icon: PlusSquare },
     { label: "Profile", href: "/profile/alexcreator", icon: User },
+    { label: "Admin", href: "/admin", icon: ShieldCheck },
   ];
 
   return (

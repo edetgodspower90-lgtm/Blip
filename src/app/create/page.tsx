@@ -27,6 +27,7 @@ export default function CreatePostPage() {
   const [tagInput, setTagInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -57,18 +58,57 @@ export default function CreatePostPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!previewUrl) return;
+    if (!previewUrl || !file) return;
 
     setIsUploading(true);
+    setErrorMsg(null);
 
-    // Simulate Supabase Storage upload and Prisma Post creation
-    setTimeout(() => {
-      setIsUploading(false);
+    try {
+      // 1. Upload media to Supabase Storage bucket 'media'
+      const uploadFormData = new FormData();
+      uploadFormData.append("file", file);
+
+      const uploadRes = await fetch("/api/upload", {
+        method: "POST",
+        body: uploadFormData,
+      });
+
+      const uploadData = await uploadRes.json();
+      if (!uploadRes.ok) {
+        throw new Error(uploadData.error || "Failed to upload media to Supabase Storage");
+      }
+
+      const mediaUrl = uploadData.url;
+
+      // 2. Create post in PostgreSQL via Prisma
+      const postRes = await fetch("/api/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          caption,
+          mediaUrl,
+          thumbnailUrl: mediaUrl,
+          mediaType,
+          audioTitle,
+          audioAuthor: "alexcreator",
+          tags,
+        }),
+      });
+
+      if (!postRes.ok) {
+        const postData = await postRes.json();
+        throw new Error(postData.error || "Failed to save post");
+      }
+
       setIsSuccess(true);
       setTimeout(() => {
         router.push("/");
-      }, 1200);
-    }, 1500);
+      }, 1000);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Failed to publish post");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -230,6 +270,13 @@ export default function CreatePostPage() {
                 />
               </div>
             </div>
+
+            {/* Error Message */}
+            {errorMsg && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+                {errorMsg}
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="pt-4 flex items-center gap-4">

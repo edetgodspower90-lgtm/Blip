@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -24,7 +24,28 @@ export default function ProfilePage({
 }) {
   const [activeTab, setActiveTab] = useState<"reels" | "grid" | "saved" | "liked">("reels");
   const [isFollowing, setIsFollowing] = useState(false);
-  const user = MOCK_CURRENT_USER;
+  const [user, setUser] = useState<any>(MOCK_CURRENT_USER);
+  const [posts, setPosts] = useState<any[]>(MOCK_POSTS);
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const res = await fetch(`/api/users/${params.username}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            setUser(data.user);
+            if (data.posts && data.posts.length > 0) {
+              setPosts(data.posts);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load live profile:", err);
+      }
+    }
+    loadProfile();
+  }, [params.username]);
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-8 pb-24">
@@ -179,7 +200,7 @@ export default function ProfilePage({
 
       {/* Media Grid Display */}
       <div className="grid grid-cols-3 gap-1 md:gap-3">
-        {MOCK_POSTS.map((post) => (
+        {posts.map((post) => (
           <Link
             key={post.id}
             href="/"
@@ -187,7 +208,7 @@ export default function ProfilePage({
           >
             <Image
               src={post.thumbnailUrl || post.mediaUrl}
-              alt={post.caption}
+              alt={post.caption || "Reel"}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
