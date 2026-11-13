@@ -1,61 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Sparkles, ArrowRight, Lock, Mail } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { Sparkles, KeyRound } from "lucide-react";
+import { SignIn } from "@clerk/nextjs";
+
+const clerkAppearance = {
+  variables: {
+    colorPrimary: "#FE2C55",
+    colorBackground: "#121212",
+    colorText: "#ffffff",
+    colorTextSecondary: "#a3a3a3",
+    colorInputBackground: "#181818",
+    colorInputText: "#ffffff",
+    borderRadius: "0.75rem",
+    fontFamily: "inherit",
+  },
+  elements: {
+    card: "bg-[#121212] border border-[#262626] shadow-none rounded-3xl",
+    socialButtonsBlockButton:
+      "bg-[#181818] border border-[#262626] text-white hover:bg-[#222] rounded-xl text-sm",
+    socialButtonsBlockButtonText: "font-semibold",
+    formFieldLabel: "text-neutral-300 text-xs font-semibold",
+    formFieldInput:
+      "bg-[#181818] border border-[#262626] text-white text-sm rounded-xl focus:border-[#FE2C55]",
+    formButtonPrimary:
+      "bg-gradient-to-r from-[#FE2C55] to-[#E02447] text-white font-bold text-sm rounded-xl shadow-lg shadow-red-950/50 hover:brightness-110",
+    footerActionLink: "text-white font-semibold hover:underline",
+    identityPreviewText: "text-white",
+    dividerLine: "bg-[#262626]",
+    dividerText: "text-neutral-500 text-xs",
+    formFieldLabelRow: "mb-1.5",
+    alertText: "text-red-200",
+    otpCodeFieldInput: "text-white",
+  },
+} as const;
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const hasClerkKey = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  const [mounted, setMounted] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg(null);
-
-    try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        // Fallback for demo mode if Supabase credentials are not connected yet
-        if (email && password) {
-          router.push("/");
-          return;
-        }
-        setErrorMsg(error.message);
-      } else {
-        router.push("/");
-      }
-    } catch {
-      // Allow demo bypass
-      router.push("/");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDemoLogin = () => {
-    setEmail("alex@blip.social");
-    setPassword("password123");
-    setTimeout(() => {
-      router.push("/");
-    }, 500);
-  };
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md bg-[#121212] border border-[#262626] rounded-3xl p-8 shadow-2xl">
         {/* Logo */}
-        <div className="flex flex-col items-center text-center mb-8">
+        <div className="flex flex-col items-center text-center mb-6">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#FE2C55] via-[#FD1D1D] to-[#25F4EE] p-[2px] mb-3">
             <div className="w-full h-full bg-black rounded-[14px] flex items-center justify-center">
               <Sparkles className="w-6 h-6 text-white" />
@@ -63,75 +56,40 @@ export default function LoginPage() {
           </div>
           <h1 className="text-2xl font-black text-white">Welcome to Blip</h1>
           <p className="text-xs text-neutral-400 mt-1">
-            Sign in to watch reels, discover creators & share moments
+            Sign in to watch reels, discover creators &amp; share moments
           </p>
         </div>
 
-        {errorMsg && (
-          <div className="p-3 mb-4 rounded-xl bg-red-950/50 border border-red-800 text-red-200 text-xs">
-            {errorMsg}
-          </div>
-        )}
-
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full pl-10 pr-4 py-3 bg-[#181818] border border-[#262626] rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#FE2C55] transition-colors"
-              />
-            </div>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-semibold text-neutral-300">Password</label>
-              <a href="#" className="text-xs text-[#25F4EE] hover:underline">
-                Forgot?
+        {!hasClerkKey ? (
+          <div className="p-4 rounded-xl bg-yellow-950/40 border border-yellow-800 text-yellow-200 text-xs flex gap-3 items-start">
+            <KeyRound className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>
+              Clerk is not configured yet. Add{" "}
+              <code className="text-white">NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY</code>{" "}
+              and <code className="text-white">CLERK_SECRET_KEY</code> to{" "}
+              <code className="text-white">.env.local</code> (from{" "}
+              <a
+                href="https://dashboard.clerk.com"
+                target="_blank"
+                rel="noreferrer"
+                className="underline"
+              >
+                dashboard.clerk.com
               </a>
-            </div>
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-3 bg-[#181818] border border-[#262626] rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#FE2C55] transition-colors"
-              />
-            </div>
+              ) to enable Google sign-in.
+            </span>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-[#FE2C55] to-[#E02447] text-white font-bold text-sm rounded-xl hover:brightness-110 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-950/50 mt-2"
-          >
-            {loading ? "Signing in..." : "Log In"}
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </form>
-
-        {/* Demo Fast Login */}
-        <div className="mt-5 pt-5 border-t border-[#262626]">
-          <button
-            type="button"
-            onClick={handleDemoLogin}
-            className="w-full py-2.5 bg-[#1e1e1e] hover:bg-[#282828] text-neutral-200 text-xs font-semibold rounded-xl border border-neutral-700 transition-colors flex items-center justify-center gap-2"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-[#25F4EE]" />
-            Fast Demo Login (Alex Rivera)
-          </button>
-        </div>
+        ) : !mounted ? (
+          <div className="h-64 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full border-2 border-[#FE2C55] border-t-transparent animate-spin" />
+          </div>
+        ) : (
+          <SignIn
+            signUpUrl="/signup"
+            forceRedirectUrl="/"
+            appearance={clerkAppearance}
+          />
+        )}
 
         <p className="text-center text-xs text-neutral-500 mt-6">
           Don&apos;t have an account?{" "}

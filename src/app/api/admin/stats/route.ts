@@ -15,6 +15,7 @@ export async function GET() {
       commentCount,
       likeCount,
       bookmarkCount,
+      paidEarnings,
       recentUsers,
       recentPosts,
     ] = await Promise.all([
@@ -26,6 +27,10 @@ export async function GET() {
       prisma.comment.count(),
       prisma.like.count(),
       prisma.bookmark.count(),
+      prisma.earning.aggregate({
+        _sum: { amountNaira: true },
+        where: { status: "PAID" },
+      }),
       prisma.user.findMany({
         take: 5,
         orderBy: { createdAt: "desc" },
@@ -78,6 +83,7 @@ export async function GET() {
         totalViews: aggregations._sum.viewsCount || 0,
         totalEngagementLikes: aggregations._sum.likesCount || 0,
         totalEngagementShares: aggregations._sum.sharesCount || 0,
+        totalPaidEarnings: paidEarnings._sum.amountNaira || 0,
       },
       recentUsers,
       recentPosts,

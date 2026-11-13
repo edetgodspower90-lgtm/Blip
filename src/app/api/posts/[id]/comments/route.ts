@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 
 export async function GET(
   request: Request,
@@ -49,13 +49,12 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const authUser = await getCurrentUser();
 
     const postId = params.id;
     const body = await request.json();
     const { content, parentId } = body;
-    const userId = user?.id || body.userId || "user-me";
+    const userId = authUser?.id || body.userId || "user-me";
 
     if (!content || !content.trim()) {
       return NextResponse.json({ error: "Content is required" }, { status: 400 });

@@ -42,6 +42,7 @@ interface StatsMetrics {
   totalViews: number;
   totalEngagementLikes: number;
   totalEngagementShares: number;
+  totalPaidEarnings?: number;
 }
 
 interface AdminUser {
@@ -107,7 +108,6 @@ export default function AdminDashboardPage() {
   const [postsLoading, setPostsLoading] = useState(false);
 
   // Actions state
-  const [seeding, setSeeding] = useState(false);
   const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   // Create User modal
@@ -199,33 +199,6 @@ export default function AdminDashboardPage() {
       fetchPosts();
     }
   }, [activeTab, fetchUsers, fetchPosts]);
-
-  // Seed demo data handler
-  const handleSeedData = async () => {
-    try {
-      setSeeding(true);
-      const res = await fetch("/api/admin/seed", { method: "POST" });
-      const data = await res.json();
-      if (res.ok) {
-        setNotification({
-          type: "success",
-          message: data.message || "Successfully seeded demo creators and posts!",
-        });
-        await fetchStats();
-        if (activeTab === "users") fetchUsers();
-        if (activeTab === "posts") fetchPosts();
-      } else {
-        setNotification({
-          type: "error",
-          message: data.error || "Failed to seed demo data.",
-        });
-      }
-    } catch (err: any) {
-      setNotification({ type: "error", message: err.message });
-    } finally {
-      setSeeding(false);
-    }
-  };
 
   // Toggle user verified badge
   const handleToggleVerified = async (user: AdminUser) => {
@@ -344,38 +317,39 @@ export default function AdminDashboardPage() {
       )}
 
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#262626]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#1F1F1F]">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#FE2C55] to-[#25F4EE] p-[2px]">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#A855F7] via-[#6366F1] to-[#06B6D4] p-[2px]">
             <div className="w-full h-full bg-black rounded-[14px] flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6 text-white" />
+              <ShieldCheck className="w-6 h-6 text-[#00FF88]" />
             </div>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold tracking-tight">Admin Control Center</h1>
-              <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-xs px-2.5 py-0.5 rounded-full font-medium flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <h1 className="text-2xl font-black tracking-tight text-white">Admin Control Center</h1>
+              <span className="bg-[#00FF88]/10 text-[#00FF88] border border-[#00FF88]/30 text-xs px-2.5 py-0.5 rounded-full font-semibold flex items-center gap-1.5 shadow-[0_0_10px_rgba(0,255,136,0.15)]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00FF88] animate-pulse" />
                 Live Supabase DB
               </span>
             </div>
             <p className="text-xs text-neutral-400 mt-0.5">
-              Manage creators, inspect reels, moderate content and monitor database health.
+              Super Admin management, real creator metrics, content moderation &amp; automated disbursements.
             </p>
           </div>
         </div>
 
         {/* Global Quick Actions */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={handleSeedData}
-            disabled={seeding}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-500/30 text-amber-300 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
-            title="Populates creators, reels, and comments into Supabase"
+          <Link
+            href="/admin/payouts"
+            className="flex items-center gap-2 px-4 py-2.5 bg-[#00FF88]/10 hover:bg-[#00FF88]/20 border border-[#00FF88]/40 text-[#00FF88] rounded-xl text-sm font-bold shadow-[0_0_15px_rgba(0,255,136,0.18)] hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] transition-all"
           >
-            <Sparkles className={cn("w-4 h-4", seeding && "animate-spin")} />
-            {seeding ? "Seeding DB..." : "Seed Demo Creators"}
-          </button>
+            <Sparkles className="w-4 h-4 text-[#00FF88]" />
+            <span>Creator Payouts</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#00FF88] text-black font-extrabold uppercase">
+              ₦ Payouts
+            </span>
+          </Link>
 
           <button
             onClick={() => {
@@ -384,15 +358,15 @@ export default function AdminDashboardPage() {
               if (activeTab === "posts") fetchPosts();
             }}
             disabled={loading}
-            className="p-2.5 bg-[#181818] hover:bg-[#222] border border-[#262626] rounded-xl text-neutral-300 hover:text-white transition-colors"
+            className="p-2.5 bg-[#121212] hover:bg-[#1A1A1A] border border-[#262626] rounded-xl text-neutral-300 hover:text-white transition-colors"
             title="Refresh statistics"
           >
-            <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
+            <RefreshCw className={cn("w-4 h-4", loading && "animate-spin text-[#00FF88]")} />
           </button>
 
           <Link
             href="/"
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-[#181818] hover:bg-[#222] border border-[#262626] text-neutral-200 hover:text-white rounded-xl text-sm font-semibold transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-[#121212] hover:bg-[#1A1A1A] border border-[#262626] text-neutral-200 hover:text-white rounded-xl text-sm font-semibold transition-colors"
           >
             <span>View App</span>
             <ExternalLink className="w-3.5 h-3.5 text-neutral-400" />
@@ -401,7 +375,14 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#262626] pb-1 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-[#1F1F1F] pb-1 overflow-x-auto">
+        <Link
+          href="/admin/payouts"
+          className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl text-[#00FF88] bg-[#00FF88]/10 border border-[#00FF88]/30 hover:bg-[#00FF88]/20 transition-all shrink-0 shadow-[0_0_10px_rgba(0,255,136,0.1)]"
+        >
+          <span className="w-2 h-2 rounded-full bg-[#00FF88] animate-pulse" />
+          Creator Payouts (₦)
+        </Link>
         <button
           onClick={() => setActiveTab("overview")}
           className={cn(
@@ -469,7 +450,28 @@ export default function AdminDashboardPage() {
       {activeTab === "overview" && (
         <div className="space-y-6">
           {/* Key Metric KPI Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {/* Creator Payouts Card */}
+            <Link
+              href="/admin/payouts"
+              className="p-5 rounded-2xl bg-[#080808] border border-[#00FF88]/40 shadow-[0_0_20px_rgba(0,255,136,0.12)] relative overflow-hidden group hover:border-[#00FF88] transition-all block"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#00FF88]">
+                  Total Disbursed
+                </span>
+                <div className="p-2 rounded-xl bg-[#00FF88]/15 text-[#00FF88]">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+              </div>
+              <div className="text-2xl font-black tracking-tight text-[#00FF88]">
+                ₦{metrics?.totalPaidEarnings ? metrics.totalPaidEarnings.toLocaleString() : "0"}
+              </div>
+              <div className="mt-2 flex items-center justify-between text-xs text-neutral-400">
+                <span className="text-[#00FF88] font-semibold group-hover:underline">Payouts Hub →</span>
+                <span className="text-[10px] text-neutral-500 font-mono">₦200/1K views</span>
+              </div>
+            </Link>
             {/* Users Card */}
             <div className="p-5 rounded-2xl bg-[#121212] border border-[#262626] relative overflow-hidden group hover:border-neutral-700 transition-all">
               <div className="flex items-center justify-between mb-3">
@@ -571,9 +573,9 @@ export default function AdminDashboardPage() {
             </div>
             <div className="flex items-center gap-3">
               {metrics && metrics.totalUsers === 0 && (
-                <div className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
-                  <AlertTriangle className="w-3.5 h-3.5" />
-                  <span>Database currently empty. Click &apos;Seed Demo Creators&apos; above!</span>
+                <div className="text-xs text-[#00FF88] bg-[#00FF88]/10 border border-[#00FF88]/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#00FF88] animate-pulse" />
+                  <span>Database ready. Real creator registrations will appear in real time.</span>
                 </div>
               )}
             </div>
@@ -598,7 +600,7 @@ export default function AdminDashboardPage() {
 
               {recentUsers.length === 0 ? (
                 <div className="text-center py-8 text-neutral-500 text-sm">
-                  No creators found yet. Use the seed button to populate demo data.
+                  No creators found yet. Real users will appear here after registering on Blip.
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -751,13 +753,8 @@ export default function AdminDashboardPage() {
             ) : users.length === 0 ? (
               <div className="p-12 text-center space-y-3">
                 <Users className="w-10 h-10 text-neutral-600 mx-auto" />
-                <p className="text-neutral-400 text-sm">No creators matched your search query.</p>
-                <button
-                  onClick={handleSeedData}
-                  className="text-xs px-3 py-1.5 bg-amber-500/20 text-amber-300 rounded-lg hover:bg-amber-500/30"
-                >
-                  Seed Demo Creators
-                </button>
+                <p className="text-neutral-400 text-sm">No creators found matching your criteria.</p>
+                <p className="text-xs text-neutral-500">New creators will appear here as they register.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -904,13 +901,14 @@ export default function AdminDashboardPage() {
             ) : posts.length === 0 ? (
               <div className="p-12 text-center space-y-3">
                 <Film className="w-10 h-10 text-neutral-600 mx-auto" />
-                <p className="text-neutral-400 text-sm">No posts found.</p>
-                <button
-                  onClick={handleSeedData}
-                  className="text-xs px-3 py-1.5 bg-amber-500/20 text-amber-300 rounded-lg hover:bg-amber-500/30"
+                <p className="text-neutral-400 text-sm">No posts or reels published yet.</p>
+                <Link
+                  href="/create"
+                  className="inline-flex items-center gap-2 text-xs px-3.5 py-2 bg-gradient-to-r from-[#A855F7] to-[#06B6D4] text-white font-bold rounded-xl hover:brightness-110"
                 >
-                  Seed Sample Reels
-                </button>
+                  <Plus className="w-3.5 h-3.5" />
+                  Upload First Reel
+                </Link>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -1092,14 +1090,13 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="pt-2">
-                <button
-                  onClick={handleSeedData}
-                  disabled={seeding}
-                  className="w-full py-2.5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 border border-amber-500/40 text-amber-300 font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-2"
+                <Link
+                  href="/admin/payouts"
+                  className="w-full py-2.5 bg-[#00FF88]/10 hover:bg-[#00FF88]/20 border border-[#00FF88]/40 text-[#00FF88] font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 shadow-[0_0_12px_rgba(0,255,136,0.15)]"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  {seeding ? "Populating Database..." : "Re-Seed Default Creators & Posts"}
-                </button>
+                  <Sparkles className="w-4 h-4 text-[#00FF88]" />
+                  Open Creator Payouts &amp; Monetization Hub
+                </Link>
               </div>
             </div>
           </div>

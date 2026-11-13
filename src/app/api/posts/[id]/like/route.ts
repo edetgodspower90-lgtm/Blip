@@ -1,18 +1,17 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 
 export async function POST(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const authUser = await getCurrentUser();
 
     const postId = params.id;
     const body = await request.json().catch(() => ({}));
-    const userId = user?.id || body.userId || "user-me";
+    const userId = authUser?.id || body.userId || "user-me";
 
     // Check if user already liked
     const existingLike = await prisma.like.findUnique({

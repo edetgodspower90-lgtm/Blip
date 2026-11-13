@@ -12,6 +12,7 @@ import {
   Film,
   Sparkles,
   ShieldCheck,
+  DollarSign,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +35,7 @@ export function Sidebar() {
     { label: "Create", href: "/create", icon: PlusSquare },
     { label: "Profile", href: "/profile/alexcreator", icon: User },
     { label: "Admin", href: "/admin", icon: ShieldCheck },
+    { label: "Payouts", href: "/admin/payouts", icon: DollarSign },
   ];
 
   return (

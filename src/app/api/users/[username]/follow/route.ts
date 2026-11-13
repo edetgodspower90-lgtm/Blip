@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 
 export async function POST(
   request: Request,
   { params }: { params: { username: string } }
 ) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const authUser = await getCurrentUser();
 
     const targetUser = await prisma.user.findUnique({
       where: { username: params.username },
@@ -19,7 +18,7 @@ export async function POST(
     }
 
     const body = await request.json().catch(() => ({}));
-    const currentUserId = user?.id || body.userId || "user-me";
+    const currentUserId = authUser?.id || body.userId || "user-me";
 
     if (currentUserId === targetUser.id) {
       return NextResponse.json({ error: "Cannot follow yourself" }, { status: 400 });
