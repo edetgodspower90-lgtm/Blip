@@ -70,7 +70,7 @@ export default function HomePage() {
   const displayedPosts = feedTab === "forYou" ? livePosts : livePosts.slice(0, 2);
 
   return (
-    <div className="relative w-full h-[calc(100vh-3.5rem)] md:h-screen bg-black overflow-hidden flex flex-col items-center">
+    <div className="relative w-full h-[calc(100vh-3.5rem)] md:h-screen bg-[#07080E] overflow-hidden flex flex-col items-center">
       {/* Top Floating Feed Navigation Tabs ("Following" | "For You") */}
       <header className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 md:py-4 pointer-events-none">
         {/* Left Live Icon / Blip TV */}
@@ -96,11 +96,11 @@ export default function HomePage() {
           >
             Following
             {feedTab === "following" && (
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-7 h-0.5 bg-white rounded-full" />
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-[2.5px] bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] rounded-full shadow-[0_0_8px_rgba(139,92,246,0.5)]" />
             )}
           </button>
 
-          <span className="text-neutral-600 text-sm">|</span>
+          <span className="text-neutral-700 text-sm">/</span>
 
           <button
             onClick={() => setFeedTab("forYou")}
@@ -113,7 +113,7 @@ export default function HomePage() {
           >
             For You
             {feedTab === "forYou" && (
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-7 h-0.5 bg-white rounded-full" />
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-[2.5px] bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] rounded-full shadow-[0_0_8px_rgba(139,92,246,0.5)]" />
             )}
           </button>
         </div>

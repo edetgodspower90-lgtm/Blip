@@ -202,7 +202,7 @@ export function ReelCard({
           {!isFollowing && (
             <button
               onClick={handleFollow}
-              className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-5 h-5 bg-[#FE2C55] rounded-full flex items-center justify-center text-white shadow-md hover:scale-110 active:scale-90 transition-transform"
+              className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-5 h-5 bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] rounded-full flex items-center justify-center text-white shadow-[0_0_8px_rgba(139,92,246,0.5)] hover:scale-110 active:scale-90 transition-transform"
               title="Follow"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
@@ -259,8 +259,8 @@ export function ReelCard({
               className={cn(
                 "w-8 h-8 transition-colors drop-shadow-md",
                 isBookmarked
-                  ? "fill-[#FD1D1D] text-[#FD1D1D]"
-                  : "text-white group-hover:text-yellow-400"
+                  ? "fill-[#06B6D4] text-[#06B6D4] drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]"
+                  : "text-white group-hover:text-[#22D3EE]"
               )}
             />
           </button>

@@ -85,7 +85,7 @@ export default function LoginPage() {
           </div>
         ) : (
           <SignIn
-            signUpUrl="/signup"
+            signUpUrl="/sign-up"
             forceRedirectUrl="/"
             appearance={clerkAppearance}
           />
@@ -93,7 +93,7 @@ export default function LoginPage() {
 
         <p className="text-center text-xs text-neutral-500 mt-6">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-white font-semibold hover:underline">
+          <Link href="/sign-up" className="text-white font-semibold hover:underline">
             Sign up
           </Link>
         </p>

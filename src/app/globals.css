@@ -4,19 +4,20 @@
 
 @layer base {
   :root {
-    --background: 0 0% 0%;
+    --background: 232 33% 4%;
     --foreground: 0 0% 100%;
   }
 
   * {
-    border-color: #262626;
+    border-color: rgba(139, 92, 246, 0.12);
   }
 
   body {
-    background-color: #000000;
+    background-color: #07080E;
     color: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Helvetica, Arial, sans-serif;
     overflow-x: hidden;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -39,29 +40,61 @@
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* Glassmorphism overlays */
-.glass-panel {
-  background: rgba(18, 18, 18, 0.75);
+/* BLIP 2050 Refined Glassmorphism */
+.glass-2050 {
+  background: rgba(13, 16, 28, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(139, 92, 246, 0.14);
+}
+
+.glass-card {
+  background: rgba(19, 23, 40, 0.6);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-pill {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(139, 92, 246, 0.12);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(139, 92, 246, 0.25);
 }
 
-/* Text glow */
-.text-shadow-sm {
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+.glass-pill-cyan {
+  background: rgba(6, 182, 212, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(6, 182, 212, 0.25);
 }
 
-.text-shadow-md {
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+/* BLIP 2050 Brand Gradient */
+.bg-gradient-2050 {
+  background: linear-gradient(135deg, #8B5CF6 0%, #6366F1 50%, #06B6D4 100%);
+}
+
+.text-gradient-2050 {
+  background: linear-gradient(135deg, #FFFFFF 0%, #C4B5FD 45%, #67E8F9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-violet {
+  background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Ambient Radial Glows */
+.ambient-glow-violet {
+  background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.12) 0%, rgba(7, 8, 14, 0) 70%);
+}
+
+.ambient-glow-cyan {
+  background: radial-gradient(circle at 50% 100%, rgba(6, 182, 212, 0.08) 0%, rgba(7, 8, 14, 0) 70%);
 }
